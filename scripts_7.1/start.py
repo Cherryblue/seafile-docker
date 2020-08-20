@@ -20,7 +20,6 @@ from utils import (
 from upgrade import check_upgrade
 from bootstrap import init_seafile_server, is_https, init_letsencrypt, generate_local_nginx_conf
 
-
 shared_seafiledir = '/shared/seafile'
 ssl_dir = '/shared/ssl'
 generated_dir = '/bootstrap/generated'
@@ -75,6 +74,13 @@ def main():
             os.unlink(password_file)
 
     print('seafile server is running now.')
+
+    try:
+        time.sleep(5)
+        call('{} start -o allow_other /fuse'.format(get_script('seaf-fuse.sh')))
+    finally:
+        print('seafuse is running now.')
+
     try:
         watch_controller()
     except KeyboardInterrupt:
