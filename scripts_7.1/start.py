@@ -79,7 +79,7 @@ def main():
         time.sleep(5)
         call('{} start -o allow_other /fuse'.format(get_script('seaf-fuse.sh')))
     finally:
-        print('seafuse is running now.')
+        print('seaf-fuse is running now.')
 
     try:
         watch_controller()
