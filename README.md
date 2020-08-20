@@ -6,7 +6,7 @@
 
 - [Docker](https://docker.com/) is an open source project to pack, ship and run any Linux application in a lighter weight, faster container than a traditional virtual machine.
 
-- [Raspberry PI](https://raspberrypi.org) is a very popular [SBC](https://en.wikipedia.org/wiki/Single-board_computer) widerly available and very cheap
+- [Raspberry PI](https://raspberrypi.org) is a very popular [SBC](https://en.wikipedia.org/wiki/Single-board_computer) widely available and very cheap
 
 **This repository is a fork of the original seafile docker image, specifically for adding support of the Raspberry PI release and automatic Seaf-Fuse use inside the container.**
 
@@ -14,7 +14,7 @@ If you need more information about the Seafile image and Docker, I encourage you
 
 ## Goals
 
-You get a docker image for you favourite selfhosted cloud software.
+You get a docker image for your favourite selfhosted cloud software.
 
 You get a seaf-fuse enabled image, allowing you to get access inside the container to the hosted files ; the short-term idea is adding a music server in order to automatically stream your personal music synced on seafile.
 
