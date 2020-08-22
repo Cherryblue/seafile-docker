@@ -115,6 +115,8 @@ else
         fi
 fi
 ```
+This must be executed on /path/to/seafile/storage/**fuse**
+
 I suggest to use it in a root crontab, every minute. Doesn't take much time nor CPU.
 
 ### Troubleshooting
