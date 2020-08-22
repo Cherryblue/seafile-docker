@@ -21,6 +21,8 @@ from upgrade import check_upgrade
 from bootstrap import init_seafile_server, is_https, init_letsencrypt, generate_local_nginx_conf
 
 shared_seafiledir = '/shared/seafile'
+fuse_seafiledir = '/shared/fuse'
+mount_point_seafiledir = '/shared/fuse/target'
 ssl_dir = '/shared/ssl'
 generated_dir = '/bootstrap/generated'
 installdir = get_install_dir()
@@ -57,6 +59,21 @@ def main():
     check_upgrade()
     os.chdir(installdir)
 
+    try:
+        os.mkdir(fuse_seafiledir)
+    except OSError:
+        print('{} already exists, continuing..'.format(fuse_seafiledir))
+
+    try:
+        os.mkdir(mount_point_seafiledir)
+    except OSError:
+        print('{} already exists, continuing..'.format(mount_point_seafiledir))
+
+    try:
+        call('{} start -o allow_other {}'.format(get_script('seaf-fuse.sh'), mount_point_seafiledir))
+    finally:
+        print('seaf-fuse is running now.')
+
     admin_pw = {
         'email': get_conf('SEAFILE_ADMIN_EMAIL', 'me@example.com'),
         'password': get_conf('SEAFILE_ADMIN_PASSWORD', 'asecret'),
@@ -74,12 +91,6 @@ def main():
             os.unlink(password_file)
 
     print('seafile server is running now.')
-
-    try:
-        time.sleep(5)
-        call('{} start -o allow_other /fuse'.format(get_script('seaf-fuse.sh')))
-    finally:
-        print('seaf-fuse is running now.')
 
     try:
         watch_controller()

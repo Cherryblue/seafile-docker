@@ -14,30 +14,26 @@ If you need more information about the Seafile image and Docker, I encourage you
 
 ## Goals
 
-You get a docker image for your favourite selfhosted cloud software.
+- You get a docker image for your favourite self-hosted cloud software.
 
-You get a seaf-fuse enabled image, allowing you to get access inside the container to the hosted files ; the short-term idea is adding a music server in order to automatically stream your personal music synced on seafile.
+- You get a seaf-fuse enabled image, allowing you to get access inside the container to the hosted files
 
-## Mods
-
-The music server will be added using Docker Mods in a Docker Compose file. This allows for flexibility in the docker spirit, while not modifying too much the original seafile docker image.
-
-I will create the following music server mods :
-- mStream
-- navidrome
-- polaris
-- ...
-
-**Keep in mind this is a WIP**
+**The short-term goal behind this is to setup a music streamer on your synced music collection. This is already working and some are available below.**
 
 ## How-to
 ### Requirements
 Get [Docker](https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/), [Docker-Compose](https://docs.docker.com/compose/install/), and [Git](https://git-scm.com/) if you wish to modify my work
 
+### Build
+```sudo make server-rpi```
+
+### Pre-build Dockerhub Image
+[Get the latest image on DockerHub](https://hub.docker.com/repository/docker/kynn/seafile-rpi)
+
 ### The docker-compose file suggested
 This is a modified version of the original docker-compose file created by Seafile Team.
 
-```version: '3.0'
+```version: '3.8'
 services:
   db:
     image: biarms/mysql:5.7.30-beta-travis
@@ -66,7 +62,12 @@ services:
       - "8042:80"   # Custom port used if you have a reverse proxy on the same server. Otherwise you can put "80:80"
       #- "443:443"  # If https is enabled, cancel the comment.
     volumes:
-      - /path/to/seafile/storagee:/shared   # Requested, specifies the path to Seafile data persistent store.
+      # See https://stackoverflow.com/questions/53631567/share-a-fuse-fs-mounted-inside-a-docker-container-through-volumes
+      - type: bind                                  # This is a specific type of volume mount called Bind-Mount
+        bind:                                       # which allows you to submount folders in it,
+          propagation: shared                       # from the host side, or from the container side.
+        source: /path/to/seafile/storage            # The goal is to submount seafile database in it using seaf-fuse
+        target: /shared                             # The seafile image I made will mount the fuse FS in /shared/fuse/mount-point
     environment:
       - DB_HOST=db
       - DB_USER_HOST=db
@@ -90,6 +91,32 @@ networks:
   seafile-net:
 ```
 
+### Mandatory Crontab Root Shell Script for unmounting broken bind-mount
+The bind-mount option needed to make fuse work with Docker, and allowing us to share it between containers doesn't unmount and remove itself when docker closes or stops.
+You need to do it with admin privilege on your Raspberry PI, using this:
+```
+#!/bin/sh
+# This script is used in conjunction to Docker
+# In order to unmount and remove what Docker can't on the host
+# When the folder is no longer used (ie Container has stopped or been restarted)
+if [ "$#" -ne 1 ]; then
+        echo "Exactly one argument must be passed; it must be the folder to unmount and remove"
+else
+        if [ -d "$1" ]; then
+                cmd="ls -l $1"
+                $cmd
+                status=$?
+                if [ "$status" -ne 0 ]; then
+                        if echo $status || grep "Transport is not connected"; then
+                                umount -l "$1/target"
+                                rm -R "$1/target"
+                        fi
+                fi
+        fi
+fi
+```
+I suggest to use it in a root crontab, every minute. Doesn't take much time nor CPU.
+
 ### Troubleshooting
 
 You can run docker commands like "docker logs" or "docker exec" to find errors.
@@ -98,4 +125,63 @@ You can run docker commands like "docker logs" or "docker exec" to find errors.
 docker logs -f seafile
 # or
 docker exec -it seafile bash
+```
+## Setting up a music streaming server
+**As said earlier, this seafile is made in order to allow the processing of a music streaming server over your self-hosted data.**
+Obviously, only music files are processed by music streaming servers, and only files not encrypted.
+**Seafile offers you the possibility to create multiple libraries in which all files will be automatically encrypted. None of these will be seen by the music streaming server.**
+
+From here, you'll be proposed different open-source softwares to add in the proposed Docker-Compose file for music streaming.
+
+### MStream
+
+[MStream](https://mstream.io/) is an excellent music streamer in JS. It has its own android flutter application, and allows you to navigate your collection by folder hierarchy.
+In order to setup it, you need to add this in the service zone of the precedent Docker-Compose file :
+```
+  mstream:
+    image: linuxserver/mstream
+    container_name: mstream
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - USER=kynn
+      - PASSWORD=klin12
+      - USE_JSON=true/false
+      - TZ=Europe/Paris
+    volumes:
+      - /media/d2to/docker/mstream:/config
+      - type: bind                                  # This is a specific type of volume mount called Bind-Mount
+        bind:                                       # which allows you to submount folders in it,
+          propagation: shared                       # from the host side, or from the container side.
+        source: /media/d2to/docker/seafile/fuse     # The goal is to submount seafile database in it using seaf-fuse
+        target: /music                              # The seafile image I made will mount the fuse FS in /shared/fuse/mount-point
+        read_only: true
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    depends_on:
+      - seafile
+```
+
+### Navidrome
+
+[Navidrome](https://www.navidrome.org/) is written in GO and compatible with AirSonic API, which allows a lot of application to be reused with it. It comes with its own Material UI web interface.
+In order to setup it, you need to add this in the service zone of the precedent Docker-Compose file :
+```
+  navidrome:
+    image: deluan/navidrome:latest
+    restart: unless-stopped
+    user: 1000:1000 # should be owner of volumes
+    ports:
+      - "4533:4533"
+    volumes:
+      - "/media/d2to/docker/navidrome:/data"
+      - type: bind                                  # This is a specific type of volume mount called Bind-Mount
+        bind:                                       # which allows you to submount folders in it,
+          propagation: shared                       # from the host side, or from the container side.
+        source: /media/d2to/docker/seafile/fuse     # The goal is to submount seafile database in it using seaf-fuse
+        target: /music                              # The seafile image I made will mount the fuse FS in /shared/fuse/mount-point
+        read_only: true
+    depends_on:
+      - seafile
 ```
