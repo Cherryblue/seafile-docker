@@ -139,7 +139,7 @@ From here, you'll be proposed different open-source softwares to add in the prop
 
 [MStream](https://mstream.io/) is an excellent music streamer in JS. It has its own android flutter application, and allows you to navigate your collection by folder hierarchy.
 
-In order to setup it, you need to add this in the service zone of the precedent Docker-Compose file :
+In order to set it up, you'll need to add this in the service zone of the precedent Docker-Compose file :
 ```
   mstream:
     image: linuxserver/mstream
@@ -170,7 +170,7 @@ In order to setup it, you need to add this in the service zone of the precedent 
 
 [Navidrome](https://www.navidrome.org/) is written in GO and compatible with AirSonic API, which allows a lot of application to be reused with it. It comes with its own Material UI web interface.
 
-In order to setup it, you need to add this in the service zone of the precedent Docker-Compose file :
+In order to set it up, you'll need to add this in the service zone of the precedent Docker-Compose file :
 ```
   navidrome:
     image: deluan/navidrome:latest
