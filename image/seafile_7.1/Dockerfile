@@ -24,7 +24,7 @@ RUN apt-get install -y \
     kmod \
     fuse
 
-RUN addgroup fuse && mkdir -p /fuse
+RUN addgroup fuse && mkdir -p /shared && mkdir -p /shared/fuse
 
 RUN python3.6 -m pip install --user --upgrade pip setuptools wheel  && rm -r /root/.cache/pip
 
