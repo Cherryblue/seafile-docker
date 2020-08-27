@@ -22,7 +22,9 @@ If you need more information about the Seafile image and Docker, I encourage you
 
 ## How-to
 ### Requirements
-Get [Docker](https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/), [Docker-Compose](https://docs.docker.com/compose/install/), and [Git](https://git-scm.com/) if you wish to modify my work
+Get [Docker](https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/), [Docker-Compose](https://docs.docker.com/compose/install/), and [Git](https://git-scm.com/) if you wish to modify my work.
+
+There seems to be a few dependencies for docker-compose : py-pip, python-dev, libffi-dev, openssl-dev, gcc, libc-dev, and make.
 
 ### Build
 ```sudo make server-rpi```
