@@ -147,16 +147,16 @@ In order to set it up, you'll need to add this in the service zone of the preced
     environment:
       - PUID=1000
       - PGID=1000
-      - USER=kynn
-      - PASSWORD=klin12
+      - USER=your_user
+      - PASSWORD=your_secret
       - USE_JSON=true/false
       - TZ=Europe/Paris
     volumes:
-      - /media/d2to/docker/mstream:/config
+      - /path/to/mstream:/config
       - type: bind                                  # This is a specific type of volume mount called Bind-Mount
         bind:                                       # which allows you to submount folders in it,
           propagation: shared                       # from the host side, or from the container side.
-        source: /media/d2to/docker/seafile/fuse     # The goal is to submount seafile database in it using seaf-fuse
+        source: /path/to/seafile/fuse               # The goal is to submount seafile database in it using seaf-fuse
         target: /music                              # The seafile image I made will mount the fuse FS in /shared/fuse/mount-point
         read_only: true
     ports:
@@ -183,7 +183,7 @@ In order to set it up, you'll need to add this in the service zone of the preced
       - type: bind                                  # This is a specific type of volume mount called Bind-Mount
         bind:                                       # which allows you to submount folders in it,
           propagation: shared                       # from the host side, or from the container side.
-        source: /media/d2to/docker/seafile/fuse     # The goal is to submount seafile database in it using seaf-fuse
+        source: /path/to/seafile/fuse               # The goal is to submount seafile database in it using seaf-fuse
         target: /music                              # The seafile image I made will mount the fuse FS in /shared/fuse/mount-point
         read_only: true
     depends_on:
