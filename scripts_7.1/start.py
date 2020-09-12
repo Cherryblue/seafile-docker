@@ -59,6 +59,23 @@ def main():
     check_upgrade()
     os.chdir(installdir)
 
+    admin_pw = {
+        'email': get_conf('SEAFILE_ADMIN_EMAIL', 'me@example.com'),
+        'password': get_conf('SEAFILE_ADMIN_PASSWORD', 'asecret'),
+    }
+    password_file = join(topdir, 'conf', 'admin.txt')
+    with open(password_file, 'w') as fp:
+        json.dump(admin_pw, fp)
+
+    try:
+        call('{} start'.format(get_script('seafile.sh')))
+        call('{} start'.format(get_script('seahub.sh')))
+    finally:
+        if exists(password_file):
+            os.unlink(password_file)
+
+    print('seafile server is running now.')
+
     try:
         os.mkdir(fuse_seafiledir)
     except OSError:
@@ -73,24 +90,6 @@ def main():
         call('{} start -o allow_other {}'.format(get_script('seaf-fuse.sh'), mount_point_seafiledir))
     finally:
         print('seaf-fuse is running now.')
-
-    admin_pw = {
-        'email': get_conf('SEAFILE_ADMIN_EMAIL', 'me@example.com'),
-        'password': get_conf('SEAFILE_ADMIN_PASSWORD', 'asecret'),
-    }
-    password_file = join(topdir, 'conf', 'admin.txt')
-    with open(password_file, 'w') as fp:
-        json.dump(admin_pw, fp)
-
-
-    try:
-        call('{} start'.format(get_script('seafile.sh')))
-        call('{} start'.format(get_script('seahub.sh')))
-    finally:
-        if exists(password_file):
-            os.unlink(password_file)
-
-    print('seafile server is running now.')
 
     try:
         watch_controller()
