@@ -58,7 +58,7 @@ services:
       - seafile-net
 
   seafile:
-    image: tata-corp/seafile-mc:7.1.4-rpi
+    image: kynn/seafile-rpi:7.1.4-2020.08.1
     restart: unless-stopped
     ports:
       - "8042:80"   # Custom port used if you have a reverse proxy on the same server. Otherwise you can put "80:80"
