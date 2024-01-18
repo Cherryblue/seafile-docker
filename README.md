@@ -24,7 +24,7 @@ Seafile Team now officially builds docker images for arm target. There isn't a n
 This repository is now based on last official dockerfile, to adjust it in order to add what is wanted :
 - Use of Fuse with Seaf_fuse
 - The new mandatory requirement for django configuration inside seafile : CSRF_TRUSTED_ORIGINS = ['your-domain']
-- A correction concerning https management : not using certbot/let's encrypt doesn't need your domain won't be accessed as such. In fact, most probably use it behind a reverseproxy, but based configuration would set "http://your-domain" instead of http**s**.
+- A correction concerning https management : not using certbot/let's encrypt doesn't mean your domain won't be accessed as such. In fact, most probably use it behind a reverseproxy, but based configuration would set "http://your-domain" instead of http**s**.
 
 ### Requirements
 Get [Docker](https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/), [Docker-Compose](https://docs.docker.com/compose/install/), and [Git](https://git-scm.com/) if you wish to modify my work.
